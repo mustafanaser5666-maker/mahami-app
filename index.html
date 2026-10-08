@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0f766e">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="مهامي">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="icon" href="/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" id="ati" href="/icon.svg">
+<title>مهامي</title>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#eef3f2;--card:#fff;--ink:#14302d;--mute:#6b8582;--line:#d8e3e1;--accent:#0f766e;--accent-ink:#fff;--flag:#d97706;--done:#9db3b0;--err:#dc2626}
+@media (prefers-color-scheme:dark){:root{--bg:#0e1b1a;--card:#162826;--ink:#e4efed;--mute:#8aa6a2;--line:#254240;--accent:#2dd4bf;--accent-ink:#06211e;--flag:#fbbf24;--done:#52716d;--err:#f87171}}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Tajawal",system-ui,-apple-system,"Segoe UI",Tahoma,sans-serif;min-height:100vh;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+main{max-width:560px;margin:0 auto;padding:24px 16px 48px}
+.hidden{display:none!important}
+h1{font-size:2rem;font-weight:800;margin:0 0 4px}
+.sub{color:var(--mute);margin:0 0 20px}
+.top{display:flex;justify-content:space-between;align-items:flex-start;gap:8px}
+.top button{border:0;background:none;color:var(--mute);font:inherit;cursor:pointer;padding:6px 4px;font-size:.9rem}
+.sync{font-size:.8rem;color:var(--mute)}
+.bar{height:8px;background:var(--line);border-radius:99px;overflow:hidden;margin-bottom:22px}
+.bar i{display:block;height:100%;width:0;background:var(--accent);transition:width .35s}
+input{font:inherit;font-size:1.05rem;padding:13px 14px;border:1.5px solid var(--line);border-radius:12px;background:var(--card);color:var(--ink);min-width:0;width:100%}
+input:focus,button:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.add{display:flex;gap:8px;margin-bottom:16px}
+.add input{flex:1}
+.flag{width:48px;flex:none;border:1.5px solid var(--line);background:var(--card);border-radius:12px;font-size:1.3rem;cursor:pointer;color:var(--mute)}
+.flag[aria-pressed="true"]{color:var(--flag);border-color:var(--flag)}
+.go{padding:0 20px;flex:none;border:0;border-radius:12px;background:var(--accent);color:var(--accent-ink);font:inherit;font-weight:700;cursor:pointer}
+.tabs{display:flex;gap:6px;margin-bottom:12px}
+.tabs button{flex:1;padding:9px;border:0;border-radius:10px;background:transparent;color:var(--mute);font:inherit;font-weight:500;cursor:pointer}
+.tabs button[aria-pressed="true"]{background:var(--card);color:var(--ink);font-weight:700;box-shadow:0 0 0 1.5px var(--line)}
+ul{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+li{display:flex;align-items:center;gap:12px;background:var(--card);border:1.5px solid var(--line);border-radius:12px;padding:12px 14px}
+li.imp{border-inline-start:5px solid var(--flag)}
+.chk{width:26px;height:26px;flex:none;border:2px solid var(--accent);border-radius:8px;background:transparent;cursor:pointer;color:var(--accent-ink);font-size:1rem;line-height:1;padding:0}
+li.done .chk{background:var(--accent)}
+.t{flex:1;overflow-wrap:anywhere;font-size:1.05rem}
+li.done .t{color:var(--done);text-decoration:line-through}
+.del{border:0;background:transparent;color:var(--mute);font-size:1.3rem;cursor:pointer;padding:4px 8px}
+.empty{text-align:center;color:var(--mute);padding:36px 0}
+.foot{display:flex;justify-content:space-between;align-items:center;margin-top:16px;color:var(--mute);font-size:.95rem}
+.foot button{border:0;background:none;color:var(--accent);font:inherit;font-weight:700;cursor:pointer}
+.auth{background:var(--card);border:1.5px solid var(--line);border-radius:16px;padding:20px;display:grid;gap:12px;margin-top:24px}
+.auth .go{padding:13px;width:100%}
+.auth .alt{border:0;background:none;color:var(--accent);font:inherit;cursor:pointer;padding:4px}
+.msg{font-size:.95rem;min-height:1.3em}
+.msg.err{color:var(--err)}
+.msg.ok{color:var(--accent)}
+</style>
+</head>
+<body>
+<main>
+  <section id="authView" class="hidden">
+    <h1>مهامي</h1>
+    <p class="sub">سجّل دخول حتى تتزامن مهامك بين كل أجهزتك</p>
+    <div class="auth">
+      <input id="email" type="email" inputmode="email" autocomplete="email" placeholder="الإيميل" dir="ltr">
+      <input id="pass" type="password" autocomplete="current-password" placeholder="كلمة السر (6 أحرف أو أكثر)" dir="ltr">
+      <button class="go" id="authGo">دخول</button>
+      <button class="alt" id="authSwitch">ماعندي حساب، سوّي حساب جديد</button>
+      <div class="msg" id="authMsg" role="status"></div>
+    </div>
+  </section>
+
+  <section id="appView" class="hidden">
+    <div class="top">
+      <div>
+        <h1>مهامي</h1>
+        <p class="sub" id="sub"></p>
+      </div>
+      <div style="text-align:end">
+        <button id="out">خروج</button>
+        <div class="sync" id="sync"></div>
+      </div>
+    </div>
+    <div class="bar"><i id="bar"></i></div>
+    <div class="add">
+      <input id="inp" placeholder="شنو الشغلة الجاية؟" maxlength="200" autocomplete="off">
+      <button class="flag" id="flag" aria-pressed="false" aria-label="مهمة مهمة">★</button>
+      <button class="go" id="go">أضيف</button>
+    </div>
+    <div class="tabs" id="tabs">
+      <button data-f="all" aria-pressed="true">الكل</button>
+      <button data-f="active" aria-pressed="false">المتبقية</button>
+      <button data-f="done" aria-pressed="false">المنجزة</button>
+    </div>
+    <ul id="list"></ul>
+    <div class="foot"><span id="cnt"></span><button id="clr">امسح المنجزة</button></div>
+  </section>
+</main>
+
+<script type="module">
+import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
+
+const SUPABASE_URL = "https://ezcvkeutgjfeenccyplt.supabase.co";
+const SUPABASE_KEY = "sb_publishable_o1X7PM0MisgO519kbMUtvA_Q07wFo_C";
+const sb = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+const $ = id => document.getElementById(id);
+let tasks = [], filter = "all", imp = false, signup = false, channel = null, user = null;
+
+/* ---------- auth ---------- */
+const setMsg = (t, cls = "") => { $("authMsg").textContent = t; $("authMsg").className = "msg " + cls; };
+function showAuth() { $("authView").classList.remove("hidden"); $("appView").classList.add("hidden"); }
+function showApp() { $("appView").classList.remove("hidden"); $("authView").classList.add("hidden"); }
+
+$("authSwitch").onclick = () => {
+  signup = !signup;
+  $("authGo").textContent = signup ? "سوّي الحساب" : "دخول";
+  $("authSwitch").textContent = signup ? "عندي حساب، سجّل دخول" : "ماعندي حساب، سوّي حساب جديد";
+  $("pass").autocomplete = signup ? "new-password" : "current-password";
+  setMsg("");
+};
+$("authGo").onclick = async () => {
+  const email = $("email").value.trim(), password = $("pass").value;
+  if (!email || password.length < 6) return setMsg("اكتب الإيميل وكلمة سر 6 أحرف على الأقل", "err");
+  $("authGo").disabled = true; setMsg("لحظة...");
+  try {
+    if (signup) {
+      const { data, error } = await sb.auth.signUp({ email, password, options: { emailRedirectTo: location.origin } });
+      if (error) throw error;
+      if (!data.session) setMsg("وصلك إيميل تأكيد، افتح الرابط بيه وبعدين سجّل دخول", "ok");
+    } else {
+      const { error } = await sb.auth.signInWithPassword({ email, password });
+      if (error) throw error;
+    }
+  } catch (e) {
+    const m = String(e.message || e);
+    setMsg(/Invalid login/i.test(m) ? "الإيميل أو كلمة السر غلط" : /confirm/i.test(m) ? "لازم تأكد الإيميل أول" : m, "err");
+  } finally { $("authGo").disabled = false; }
+};
+$("pass").addEventListener("keydown", e => { if (e.key === "Enter") $("authGo").click(); });
+$("out").onclick = async () => { await sb.auth.signOut(); };
+
+sb.auth.onAuthStateChange((_ev, session) => {
+  const u = session?.user || null;
+  if (u?.id === user?.id && u) return;
+  user = u;
+  if (channel) { sb.removeChannel(channel); channel = null; }
+  if (!u) { tasks = []; showAuth(); return; }
+  showApp(); loadTasks(); subscribe();
+});
+
+/* ---------- data ---------- */
+const setSync = t => { $("sync").textContent = t; };
+async function loadTasks() {
+  setSync("يزامن...");
+  const { data, error } = await sb.from("tasks").select("*").order("created_at", { ascending: false });
+  if (error) { setSync("ماكو اتصال"); return; }
+  tasks = data; setSync("متزامن ✓"); render();
+}
+function subscribe() {
+  channel = sb.channel("tasks-" + user.id)
+    .on("postgres_changes", { event: "*", schema: "public", table: "tasks", filter: `user_id=eq.${user.id}` }, p => {
+      if (p.eventType === "DELETE") tasks = tasks.filter(t => t.id !== p.old.id);
+      else {
+        const i = tasks.findIndex(t => t.id === p.new.id);
+        if (i >= 0) tasks[i] = p.new; else tasks.unshift(p.new);
+      }
+      render();
+    }).subscribe();
+}
+document.addEventListener("visibilitychange", () => { if (!document.hidden && user) loadTasks(); });
+window.addEventListener("online", () => { if (user) loadTasks(); });
+
+async function addTask() {
+  const v = $("inp").value.trim(); if (!v) return;
+  const row = { id: crypto.randomUUID(), text: v, done: false, important: imp, created_at: new Date().toISOString() };
+  tasks.unshift(row);
+  $("inp").value = ""; imp = false; $("flag").setAttribute("aria-pressed", "false");
+  render(); $("inp").focus();
+  const { error } = await sb.from("tasks").insert({ id: row.id, text: row.text, important: row.important });
+  if (error) { tasks = tasks.filter(t => t.id !== row.id); render(); setSync("ماكو اتصال"); } else setSync("متزامن ✓");
+}
+async function toggle(t) {
+  t.done = !t.done; render();
+  const { error } = await sb.from("tasks").update({ done: t.done }).eq("id", t.id);
+  if (error) { t.done = !t.done; render(); setSync("ماكو اتصال"); }
+}
+async function remove(t) {
+  tasks = tasks.filter(k => k.id !== t.id); render();
+  const { error } = await sb.from("tasks").delete().eq("id", t.id);
+  if (error) { loadTasks(); }
+}
+async function clearDone() {
+  const ids = tasks.filter(t => t.done).map(t => t.id);
+  if (!ids.length) return;
+  tasks = tasks.filter(t => !t.done); render();
+  const { error } = await sb.from("tasks").delete().in("id", ids);
+  if (error) loadTasks();
+}
+
+/* ---------- ui ---------- */
+function render() {
+  const done = tasks.filter(t => t.done).length, left = tasks.length - done;
+  $("bar").style.width = (tasks.length ? done / tasks.length * 100 : 0) + "%";
+  $("sub").textContent = tasks.length ? (left ? `باقي ${left} من ${tasks.length}` : "خلصت كلشي، عاش!") : "ابدأ بإضافة أول مهمة";
+  $("cnt").textContent = `${done} منجزة`;
+  $("clr").style.visibility = done ? "visible" : "hidden";
+  const shown = tasks.filter(t => filter === "all" || (filter === "done") === t.done);
+  const sorted = [...shown].sort((a, b) => (a.done - b.done) || (b.important - a.important) || (new Date(b.created_at) - new Date(a.created_at)));
+  const ul = $("list"); ul.innerHTML = "";
+  if (!sorted.length) { ul.innerHTML = '<div class="empty">ماكو مهام هنا</div>'; return; }
+  sorted.forEach(t => {
+    const li = document.createElement("li");
+    li.className = (t.done ? "done " : "") + (t.important ? "imp" : "");
+    const c = document.createElement("button"); c.className = "chk"; c.textContent = t.done ? "✓" : "";
+    c.setAttribute("aria-label", "إنجاز"); c.onclick = () => toggle(t);
+    const s = document.createElement("span"); s.className = "t"; s.textContent = t.text;
+    const x = document.createElement("button"); x.className = "del"; x.textContent = "×";
+    x.setAttribute("aria-label", "حذف"); x.onclick = () => remove(t);
+    li.append(c, s, x); ul.append(li);
+  });
+}
+$("go").onclick = addTask;
+$("inp").addEventListener("keydown", e => { if (e.key === "Enter") addTask(); });
+$("flag").onclick = () => { imp = !imp; $("flag").setAttribute("aria-pressed", imp); };
+$("clr").onclick = clearDone;
+$("tabs").onclick = e => {
+  const b = e.target.closest("button"); if (!b) return; filter = b.dataset.f;
+  [...$("tabs").children].forEach(k => k.setAttribute("aria-pressed", k === b)); render();
+};
+
+
+/* iOS needs a PNG touch icon: draw one on a canvas */
+try{const c=document.createElement("canvas");c.width=c.height=180;const g=c.getContext("2d");
+g.fillStyle="#0f766e";g.fillRect(0,0,180,180);g.strokeStyle="#fff";g.lineWidth=14;g.lineCap="round";g.lineJoin="round";
+g.beginPath();g.moveTo(48,95);g.lineTo(78,125);g.lineTo(134,63);g.stroke();
+document.getElementById("ati").href=c.toDataURL("image/png");}catch(e){}
+
+if ("serviceWorker" in navigator) navigator.serviceWorker.register("/sw.js").catch(() => {});
+</script>
+</body>
+</html>
